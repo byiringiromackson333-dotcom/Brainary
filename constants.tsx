@@ -6,7 +6,7 @@ import {
     AcademicCapIcon, LightBulbIcon, ChatBubbleLeftRightIcon, WrenchScrewdriverIcon, ChartBarIcon, CpuChipIcon 
 } from './components/common/Icons';
 
-export const APP_NAME = "AI Learning Companion";
+export const APP_NAME = "Brainary";
 
 export const SUBJECTS: Subject[] = [
   // Primary
