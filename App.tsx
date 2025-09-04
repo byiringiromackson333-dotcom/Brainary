@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { User, View, Subject, Exam, Report } from './types';
 import { getUser, saveUser, clearReports } from './services/localStorageService';
 import Header from './components/Header';
+import Home from './components/Home';
 import ProfileSetup from './components/ProfileSetup';
 import Dashboard from './components/Dashboard';
 import LearningZone from './components/LearningZone';
@@ -11,7 +12,7 @@ import Settings from './components/Settings';
 
 const App: React.FC = () => {
   const [user, setUser] = useState<User | null>(null);
-  const [currentView, setCurrentView] = useState<View>(View.DASHBOARD);
+  const [currentView, setCurrentView] = useState<View>(View.HOME);
   const [selectedSubject, setSelectedSubject] = useState<Subject | null>(null);
   const [currentExam, setCurrentExam] = useState<Exam | null>(null);
   const [currentReport, setCurrentReport] = useState<Report | null>(null);
@@ -22,9 +23,13 @@ const App: React.FC = () => {
       setUser(storedUser);
       setCurrentView(View.DASHBOARD);
     } else {
-      setCurrentView(View.PROFILE_SETUP);
+      setCurrentView(View.HOME);
     }
   }, []);
+
+  const handleGetStarted = () => {
+    setCurrentView(View.PROFILE_SETUP);
+  };
 
   const handleProfileSave = (newUser: User) => {
     saveUser(newUser);
@@ -51,7 +56,7 @@ const App: React.FC = () => {
     setSelectedSubject(null);
     setCurrentExam(null);
     setCurrentReport(null);
-    setCurrentView(View.PROFILE_SETUP);
+    setCurrentView(View.HOME);
   };
 
   const startLearning = useCallback((subject: Subject) => {
@@ -88,32 +93,30 @@ const App: React.FC = () => {
   }, []);
 
   const renderContent = () => {
-    if (!user) {
-        return <ProfileSetup onSave={handleProfileSave} />;
-    }
-
     switch (currentView) {
+      case View.HOME:
+        return <Home onGetStarted={handleGetStarted} />;
       case View.PROFILE_SETUP:
         return <ProfileSetup onSave={handleProfileSave} />;
       case View.DASHBOARD:
-        return <Dashboard user={user} onStartLearning={startLearning} onStartExamRequest={startExam} onShowReport={viewReport} />;
+        return <Dashboard user={user!} onStartLearning={startLearning} onStartExamRequest={startExam} onShowReport={viewReport} />;
       case View.LEARNING:
-        return <LearningZone user={user} subject={selectedSubject!} onBack={showDashboard} />;
+        return <LearningZone user={user!} subject={selectedSubject!} onBack={showDashboard} />;
       case View.EXAM:
-        return <ExamZone user={user} subject={selectedSubject!} exam={currentExam!} onFinishExam={showExamResults} onBack={showDashboard} />;
+        return <ExamZone user={user!} subject={selectedSubject!} exam={currentExam!} onFinishExam={showExamResults} onBack={showDashboard} />;
       case View.REPORT:
-        return <ReportCard user={user} report={currentReport!} subject={selectedSubject!} onBack={showDashboard} />;
+        return <ReportCard user={user!} report={currentReport!} subject={selectedSubject!} onBack={showDashboard} />;
       case View.SETTINGS:
-        return <Settings user={user} onSave={handleProfileUpdate} onClearReports={handleClearReports} onBack={showDashboard} />;
+        return <Settings user={user!} onSave={handleProfileUpdate} onClearReports={handleClearReports} onBack={showDashboard} />;
       default:
-        return <Dashboard user={user} onStartLearning={startLearning} onStartExamRequest={startExam} onShowReport={viewReport} />;
+        return <Home onGetStarted={handleGetStarted} />;
     }
   };
 
   return (
     <div className="min-h-screen bg-background font-sans text-text-primary">
-      <Header user={user} onLogout={handleLogout} onShowSettings={showSettings} />
-      <main className="container mx-auto p-4 md:p-8">
+      {currentView !== View.HOME && <Header user={user} onLogout={handleLogout} onShowSettings={showSettings} />}
+      <main className={currentView !== View.HOME ? "container mx-auto p-4 md:p-8" : ""}>
         {renderContent()}
       </main>
     </div>

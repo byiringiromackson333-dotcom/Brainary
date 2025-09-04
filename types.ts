@@ -11,6 +11,7 @@ export interface Subject {
 }
 
 export enum View {
+  HOME = 'HOME',
   PROFILE_SETUP = 'PROFILE_SETUP',
   DASHBOARD = 'DASHBOARD',
   LEARNING = 'LEARNING',

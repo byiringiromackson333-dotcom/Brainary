@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useMemo } from 'react';
 import { User, Subject, Exam, Report } from '../types';
 import { SUBJECTS, EXAM_QUESTION_COUNT } from '../constants';
@@ -19,23 +20,29 @@ const Dashboard: React.FC<DashboardProps> = ({ user, onStartLearning, onStartExa
     const [isLoadingExam, setIsLoadingExam] = useState<string | null>(null);
     const [pastReports, setPastReports] = useState<Report[]>([]);
     const [searchQuery, setSearchQuery] = useState('');
+    const [isDifficultyModalOpen, setIsDifficultyModalOpen] = useState(false);
+    const [subjectForExam, setSubjectForExam] = useState<Subject | null>(null);
+    const [examDifficulty, setExamDifficulty] = useState<number>(1);
 
     useEffect(() => {
         setPastReports(getReports().sort((a, b) => b.date - a.date));
     }, []);
 
-    const handleStartExam = async (subject: Subject) => {
-        setIsLoadingExam(subject.name);
+    const handleStartExam = async () => {
+        if (!subjectForExam) return;
+
+        setIsDifficultyModalOpen(false);
+        setIsLoadingExam(subjectForExam.name);
         try {
-            const questions = await generateExamQuestions(subject.name, user.grade, EXAM_QUESTION_COUNT);
+            const questions = await generateExamQuestions(subjectForExam.name, user.grade, EXAM_QUESTION_COUNT, examDifficulty);
             if (questions.length > 0) {
                 const newExam: Exam = {
                     id: `exam_${Date.now()}`,
-                    subject: subject.name,
+                    subject: subjectForExam.name,
                     questions,
                     date: Date.now(),
                 };
-                onStartExamRequest(subject, newExam);
+                onStartExamRequest(subjectForExam, newExam);
             } else {
                 alert("Sorry, we couldn't generate an exam right now. Please try again later.");
             }
@@ -44,7 +51,14 @@ const Dashboard: React.FC<DashboardProps> = ({ user, onStartLearning, onStartExa
             alert("An error occurred while creating your exam.");
         } finally {
             setIsLoadingExam(null);
+            setSubjectForExam(null);
         }
+    };
+    
+    const openDifficultySelector = (subject: Subject) => {
+        setSubjectForExam(subject);
+        setExamDifficulty(1);
+        setIsDifficultyModalOpen(true);
     };
 
     const filteredSubjects = useMemo(() => {
@@ -91,7 +105,7 @@ const Dashboard: React.FC<DashboardProps> = ({ user, onStartLearning, onStartExa
                                 <div className="flex flex-col space-y-2 w-full">
                                     <Button onClick={() => onStartLearning(subject)} variant="primary" size="sm">Learn</Button>
                                     <Button 
-                                        onClick={() => handleStartExam(subject)} 
+                                        onClick={() => openDifficultySelector(subject)} 
                                         variant="secondary" 
                                         size="sm" 
                                         disabled={isLoadingExam === subject.name}
@@ -143,6 +157,39 @@ const Dashboard: React.FC<DashboardProps> = ({ user, onStartLearning, onStartExa
                     </Card>
                 )}
             </section>
+            
+            {isDifficultyModalOpen && subjectForExam && (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50 animate-fade-in">
+                    <Card className="w-full max-w-md animate-slide-in-up">
+                        <h3 className="text-xl font-bold mb-2">Select Difficulty</h3>
+                        <p className="mb-4 text-text-secondary">Choose a difficulty level for your {subjectForExam.name} exam.</p>
+                        
+                        <div>
+                            <label htmlFor="difficulty" className="block text-sm font-medium text-text-secondary">
+                                Difficulty Level: <span className="font-bold text-primary">{examDifficulty}</span>
+                            </label>
+                            <input
+                                type="range"
+                                id="difficulty"
+                                min="1"
+                                max="43"
+                                value={examDifficulty}
+                                onChange={(e) => setExamDifficulty(Number(e.target.value))}
+                                className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-primary"
+                            />
+                             <div className="flex justify-between text-xs text-text-secondary mt-1">
+                                <span>Level 1 (Easy)</span>
+                                <span>Level 43 (Hard)</span>
+                            </div>
+                        </div>
+
+                        <div className="mt-6 flex justify-end space-x-3">
+                            <Button variant="secondary" onClick={() => setIsDifficultyModalOpen(false)}>Cancel</Button>
+                            <Button onClick={handleStartExam}>Start Exam</Button>
+                        </div>
+                    </Card>
+                </div>
+            )}
         </div>
     );
 };

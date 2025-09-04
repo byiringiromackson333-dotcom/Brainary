@@ -29,11 +29,13 @@ export const explainTopic = async (topic: string, subject: string, grade: string
   }
 };
 
-export const generateExamQuestions = async (subject: string, grade: string, numQuestions: number): Promise<Question[]> => {
+export const generateExamQuestions = async (subject: string, grade: string, numQuestions: number, difficulty: number): Promise<Question[]> => {
     try {
+        const prompt = `Generate a ${numQuestions}-question multiple-choice quiz on the subject of ${subject} for a student in grade ${grade}. The difficulty level for this quiz should be ${difficulty} on a scale from 1 (very easy) to 43 (expert level). Based on this difficulty, please adjust the complexity of the questions, the depth of the concepts tested, and the subtlety of the incorrect options (distractors). For each question, provide 4 options, and the correct answer must be one of the options.`;
+        
         const response = await ai.models.generateContent({
             model,
-            contents: `Generate a ${numQuestions}-question multiple-choice quiz on the subject of ${subject} for a student in grade ${grade}. For each question, provide 4 options, and the correct answer must be one of the options.`,
+            contents: prompt,
             config: {
                 responseMimeType: "application/json",
                 responseSchema: {
