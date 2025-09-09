@@ -1,13 +1,13 @@
 
 import React, { useState, useMemo, useEffect, useCallback } from 'react';
-import { User, Subject, Exam, Report, UserAnswer } from '../types';
+import { User, Subject, Exam, Report, UserAnswer, SubjectProgress } from '../types';
 import Button from './common/Button';
 import Card from './common/Card';
 import Spinner from './common/Spinner';
 import { getExamFeedback } from '../services/geminiService';
 import { saveReport } from '../services/localStorageService';
-import { EXAM_DURATION_SECONDS } from '../constants';
 
+const PASS_PERCENTAGE = 80;
 
 interface ExamZoneProps {
   user: User;
@@ -15,13 +15,14 @@ interface ExamZoneProps {
   exam: Exam;
   onFinishExam: (report: Report) => void;
   onBack: () => void;
+  onUpdateUser: (user: User) => void;
 }
 
-const ExamZone: React.FC<ExamZoneProps> = ({ user, subject, exam, onFinishExam, onBack }) => {
+const ExamZone: React.FC<ExamZoneProps> = ({ user, subject, exam, onFinishExam, onBack, onUpdateUser }) => {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [answers, setAnswers] = useState<Record<number, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [timeLeft, setTimeLeft] = useState(EXAM_DURATION_SECONDS);
+  const [timeLeft, setTimeLeft] = useState(exam.duration);
 
   const currentQuestion = exam.questions[currentQuestionIndex];
 
@@ -45,6 +46,24 @@ const ExamZone: React.FC<ExamZoneProps> = ({ user, subject, exam, onFinishExam, 
         };
     });
 
+    const scorePercent = (score / exam.questions.length) * 100;
+    const passed = scorePercent >= PASS_PERCENTAGE;
+    
+    // Update user progress
+    const newProgress = { ...(user.progress || {}) };
+    const subjectProgress: SubjectProgress = newProgress[subject.name] || { currentDifficulty: exam.difficulty, consecutiveFails: 0 };
+    
+    if(passed) {
+        subjectProgress.consecutiveFails = 0;
+    } else {
+        // Only increment fails if the exam was at their current difficulty level
+        if (exam.difficulty === subjectProgress.currentDifficulty) {
+            subjectProgress.consecutiveFails = (subjectProgress.consecutiveFails || 0) + 1;
+        }
+    }
+    newProgress[subject.name] = subjectProgress;
+    onUpdateUser({ ...user, progress: newProgress });
+
     try {
         const feedback = await getExamFeedback(subject.name, user.grade, results, score, exam.questions.length);
         const report: Report = {
@@ -54,16 +73,17 @@ const ExamZone: React.FC<ExamZoneProps> = ({ user, subject, exam, onFinishExam, 
             totalQuestions: exam.questions.length,
             results,
             feedback,
-            date: Date.now()
+            date: Date.now(),
+            difficulty: exam.difficulty,
         };
-        saveReport(report);
+        saveReport(report, user.username);
         onFinishExam(report);
     } catch(error) {
         console.error("Error submitting exam:", error);
         alert("There was an error submitting your exam. Please try again.");
         setIsSubmitting(false);
     }
-  }, [answers, exam, subject, user, onFinishExam]);
+  }, [answers, exam, subject.name, user, onFinishExam, onUpdateUser]);
 
   useEffect(() => {
     if (isSubmitting) return;
@@ -123,7 +143,7 @@ const ExamZone: React.FC<ExamZoneProps> = ({ user, subject, exam, onFinishExam, 
     <div className="animate-slide-in-up max-w-4xl mx-auto">
       <div className="flex items-center mb-6">
         <Button onClick={onBack} variant="secondary" size="sm" className="mr-4">&larr; Dashboard</Button>
-        <h2 className="text-3xl font-bold">{subject.name} Exam</h2>
+        <h2 className="text-3xl font-bold">{subject.name} Exam <span className="text-xl text-text-secondary font-medium">(Lvl {exam.difficulty})</span></h2>
       </div>
       <Card>
         <div className="mb-4">

@@ -3,7 +3,8 @@ import React from 'react';
 import { Subject } from './types';
 import { 
     CpuChipIcon, WrenchScrewdriverIcon, GlobeAltIcon, LightBulbIcon,
-    CodeBracketIcon, ChartBarIcon, AcademicCapIcon, BeakerIcon
+    CodeBracketIcon, ChartBarIcon, AcademicCapIcon, BeakerIcon, BookOpenIcon,
+    SparklesIcon, ChartPieIcon
 } from './components/common/Icons';
 
 export const APP_NAME = "Brainary";
@@ -19,7 +20,12 @@ export const SUBJECTS: Subject[] = [
   { name: 'Multimedia', icon: <AcademicCapIcon className="w-8 h-8" />, color: 'bg-pink-500' },
   { name: 'Agriculture', icon: <BeakerIcon className="w-8 h-8" />, color: 'bg-green-500' },
   { name: 'Automobile Mechanics', icon: <WrenchScrewdriverIcon className="w-8 h-8" />, color: 'bg-red-500' },
+  { name: 'History', icon: <BookOpenIcon className="w-8 h-8" />, color: 'bg-amber-500' },
+  { name: 'Chemistry', icon: <BeakerIcon className="w-8 h-8" />, color: 'bg-teal-500' },
+  { name: 'Physics', icon: <SparklesIcon className="w-8 h-8" />, color: 'bg-rose-500' },
+  { name: 'Geography', icon: <GlobeAltIcon className="w-8 h-8" />, color: 'bg-sky-500' },
+  { name: 'Literature', icon: <BookOpenIcon className="w-8 h-8" />, color: 'bg-stone-500' },
+  { name: 'Economics', icon: <ChartPieIcon className="w-8 h-8" />, color: 'bg-blue-500' },
 ];
 
-export const EXAM_QUESTION_COUNT = 5;
-export const EXAM_DURATION_SECONDS = 300; // 5 minutes
+export const EXAM_QUESTION_COUNT = 10;

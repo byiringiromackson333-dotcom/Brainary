@@ -1,10 +1,12 @@
+
 import React from 'react';
 import Button from './common/Button';
 import { APP_NAME } from '../constants';
 import { ChatBubbleLeftRightIcon, ClipboardDocumentCheckIcon, ChartPieIcon } from './common/Icons';
 
 interface HomeProps {
-  onGetStarted: () => void;
+  onLoginClick: () => void;
+  onRegisterClick: () => void;
 }
 
 const FeatureCard: React.FC<{ icon: React.ReactNode; title: string; children: React.ReactNode }> = ({ icon, title, children }) => (
@@ -17,15 +19,20 @@ const FeatureCard: React.FC<{ icon: React.ReactNode; title: string; children: Re
     </div>
 );
 
-const Home: React.FC<HomeProps> = ({ onGetStarted }) => {
+const Home: React.FC<HomeProps> = ({ onLoginClick, onRegisterClick }) => {
   return (
     <div className="bg-background text-text-primary animate-fade-in">
       <header className="absolute top-0 left-0 right-0 z-10 p-4">
         <div className="container mx-auto flex justify-between items-center">
             <h1 className="text-2xl font-bold text-primary">{APP_NAME}</h1>
-            <Button onClick={onGetStarted} variant="primary" size="md">
-                Get Started
-            </Button>
+            <div className="flex items-center space-x-2">
+                <Button onClick={onLoginClick} variant="secondary" className="px-3 py-1.5 text-sm sm:px-4 sm:py-2 sm:text-base">
+                    Login
+                </Button>
+                <Button onClick={onRegisterClick} variant="primary" className="px-3 py-1.5 text-sm sm:px-4 sm:py-2 sm:text-base">
+                    Sign Up
+                </Button>
+            </div>
         </div>
       </header>
 
@@ -44,7 +51,7 @@ const Home: React.FC<HomeProps> = ({ onGetStarted }) => {
                     {APP_NAME} is your personal AI-powered study partner. Get instant explanations, take practice exams, and receive smart feedback to master any subject.
                 </p>
                 <div className="animate-slide-in-up" style={{ animationDelay: '0.4s' }}>
-                    <Button onClick={onGetStarted} size="lg" className="shadow-2xl shadow-primary/40">
+                    <Button onClick={onRegisterClick} size="lg" className="shadow-2xl shadow-primary/40">
                         Get Started for Free
                     </Button>
                 </div>
@@ -80,8 +87,8 @@ const Home: React.FC<HomeProps> = ({ onGetStarted }) => {
                     <div className="absolute top-1/2 left-0 w-full h-px bg-gray-200 hidden md:block"></div>
                     <div className="relative flex flex-col items-center">
                         <div className="flex items-center justify-center w-16 h-16 bg-white border-2 border-primary rounded-full text-primary font-bold text-2xl mb-4 z-10">1</div>
-                        <h3 className="font-bold text-xl mb-2">Create Your Profile</h3>
-                        <p className="text-text-secondary">Tell us your name and grade so we can personalize your learning experience.</p>
+                        <h3 className="font-bold text-xl mb-2">Create Your Account</h3>
+                        <p className="text-text-secondary">Sign up with a username and password to keep your progress safe.</p>
                     </div>
                      <div className="relative flex flex-col items-center">
                         <div className="flex items-center justify-center w-16 h-16 bg-white border-2 border-primary rounded-full text-primary font-bold text-2xl mb-4 z-10">2</div>
@@ -104,7 +111,7 @@ const Home: React.FC<HomeProps> = ({ onGetStarted }) => {
                     Ready to Transform Your Study Habits?
                 </h2>
                 <p className="text-lg text-text-secondary mt-4 mb-8">Join thousands of students learning smarter with {APP_NAME}.</p>
-                <Button onClick={onGetStarted} size="lg" className="shadow-2xl shadow-primary/40">
+                <Button onClick={onRegisterClick} size="lg" className="shadow-2xl shadow-primary/40">
                     Sign Up Now
                 </Button>
             </div>

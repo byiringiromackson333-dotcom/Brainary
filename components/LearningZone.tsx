@@ -1,9 +1,9 @@
-
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect, useRef } from 'react';
 import { User, Subject, ChatMessage } from '../types';
 import Button from './common/Button';
 import Spinner from './common/Spinner';
-import { explainTopic } from '../services/geminiService';
+import { explainTopic, generateRelatedTopics } from '../services/geminiService';
+import { SparklesIcon } from './common/Icons';
 import ReactMarkdown from 'react-markdown';
 
 
@@ -19,27 +19,53 @@ const LearningZone: React.FC<LearningZoneProps> = ({ user, subject, onBack }) =>
   ]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [suggestedTopics, setSuggestedTopics] = useState<string[]>([]);
+  const [isGeneratingSuggestions, setIsGeneratingSuggestions] = useState(false);
+  const chatEndRef = useRef<HTMLDivElement>(null);
 
-  const handleSendMessage = useCallback(async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!input.trim() || isLoading) return;
+  useEffect(() => {
+    chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages, isLoading, suggestedTopics]);
 
-    const userMessage: ChatMessage = { sender: 'user', text: input };
+  const askAboutTopic = useCallback(async (topic: string) => {
+    if (!topic.trim() || isLoading) return;
+
+    const userMessage: ChatMessage = { sender: 'user', text: topic };
     setMessages(prev => [...prev, userMessage]);
     setInput('');
     setIsLoading(true);
+    setSuggestedTopics([]);
 
     try {
-      const aiResponse = await explainTopic(input, subject.name, user.grade);
+      const aiResponse = await explainTopic(topic, subject.name, user.grade);
       const aiMessage: ChatMessage = { sender: 'ai', text: aiResponse };
       setMessages(prev => [...prev, aiMessage]);
+
+      setIsGeneratingSuggestions(true);
+      try {
+        const related = await generateRelatedTopics(topic, subject.name, user.grade);
+        setSuggestedTopics(related);
+      } catch (suggestionError) {
+        console.error("Could not generate suggestions:", suggestionError);
+      } finally {
+        setIsGeneratingSuggestions(false);
+      }
     } catch (error) {
       const errorMessage: ChatMessage = { sender: 'ai', text: "Sorry, I'm having trouble connecting. Please try again." };
       setMessages(prev => [...prev, errorMessage]);
     } finally {
       setIsLoading(false);
     }
-  }, [input, isLoading, subject, user.grade]);
+  }, [isLoading, subject.name, user.grade]);
+
+  const handleFormSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    askAboutTopic(input);
+  };
+  
+  const handleSuggestionClick = (topic: string) => {
+      askAboutTopic(topic);
+  };
 
   return (
     <div className="animate-slide-in-up max-w-4xl mx-auto">
@@ -51,8 +77,8 @@ const LearningZone: React.FC<LearningZoneProps> = ({ user, subject, onBack }) =>
         <div className="flex-1 p-6 overflow-y-auto space-y-4">
           {messages.map((msg, index) => (
             <div key={index} className={`flex ${msg.sender === 'user' ? 'justify-end' : 'justify-start'}`}>
-              <div className={`max-w-lg p-3 rounded-2xl ${msg.sender === 'user' ? 'bg-primary text-white' : 'bg-gray-200 text-text-primary'}`}>
-                <ReactMarkdown className="prose">{msg.text}</ReactMarkdown>
+              <div className={`prose max-w-lg p-3 rounded-2xl ${msg.sender === 'user' ? 'bg-primary text-white' : 'bg-gray-200 text-text-primary'}`}>
+                <ReactMarkdown>{msg.text}</ReactMarkdown>
               </div>
             </div>
           ))}
@@ -64,9 +90,30 @@ const LearningZone: React.FC<LearningZoneProps> = ({ user, subject, onBack }) =>
                 </div>
             </div>
           )}
+           <div ref={chatEndRef} />
         </div>
         <div className="p-4 border-t">
-          <form onSubmit={handleSendMessage} className="flex space-x-2">
+          {(isGeneratingSuggestions || suggestedTopics.length > 0) && (
+            <div className="mb-4 px-2">
+                <div className="flex items-center text-sm font-semibold text-text-secondary mb-2">
+                    <SparklesIcon className="w-5 h-5 mr-2 text-primary" />
+                    <span>Related Topics</span>
+                </div>
+                {isGeneratingSuggestions && <div className="text-sm text-text-secondary">Generating suggestions...</div>}
+                <div className="flex flex-wrap gap-2">
+                    {suggestedTopics.map((topic, i) => (
+                        <button 
+                            key={i} 
+                            onClick={() => handleSuggestionClick(topic)}
+                            className="bg-primary/10 text-primary hover:bg-primary/20 text-sm font-medium py-1 px-3 rounded-full transition-colors"
+                        >
+                            {topic}
+                        </button>
+                    ))}
+                </div>
+            </div>
+          )}
+          <form onSubmit={handleFormSubmit} className="flex space-x-2">
             <input
               type="text"
               value={input}

@@ -29,9 +29,50 @@ export const explainTopic = async (topic: string, subject: string, grade: string
   }
 };
 
+export const generateRelatedTopics = async (topic: string, subject: string, grade: string): Promise<string[]> => {
+    try {
+        const prompt = `Based on the topic "${topic}" in the subject of ${subject} for a grade ${grade} student, suggest 3 to 5 related topics or sub-topics they could explore next. The suggestions should be concise.`;
+
+        const response = await ai.models.generateContent({
+            model,
+            contents: prompt,
+            config: {
+                responseMimeType: "application/json",
+                responseSchema: {
+                    type: Type.OBJECT,
+                    properties: {
+                        topics: {
+                            type: Type.ARRAY,
+                            items: { type: Type.STRING }
+                        }
+                    },
+                    required: ["topics"]
+                }
+            }
+        });
+        
+        const jsonStr = response.text.trim();
+        const parsed = JSON.parse(jsonStr);
+        return parsed.topics || [];
+
+    } catch (error) {
+        console.error("Error generating related topics:", error);
+        return [];
+    }
+};
+
 export const generateExamQuestions = async (subject: string, grade: string, numQuestions: number, difficulty: number): Promise<Question[]> => {
     try {
-        const prompt = `Generate a ${numQuestions}-question multiple-choice quiz on the subject of ${subject} for a student in grade ${grade}. The difficulty level for this quiz should be ${difficulty} on a scale from 1 (very easy) to 43 (expert level). Based on this difficulty, please adjust the complexity of the questions, the depth of the concepts tested, and the subtlety of the incorrect options (distractors). For each question, provide 4 options, and the correct answer must be one of the options.`;
+        const prompt = `Generate a ${numQuestions}-question multiple-choice quiz for a student in grade ${grade} studying the subject "${subject}".
+
+The desired difficulty level for this quiz is ${difficulty} on a scale of 1 to 43, where 1 is extremely easy and 43 is expert-level.
+
+Please adhere to the following instructions based on the difficulty level:
+- **Question Complexity:** For difficulty level ${difficulty}, create questions that are appropriately challenging. Lower levels should have straightforward questions, while higher levels should involve multi-step problems, abstract reasoning, or synthesis of multiple concepts.
+- **Concept Depth:** Test concepts at a depth suitable for difficulty ${difficulty}. Lower levels should focus on foundational knowledge and definitions. Higher levels should probe deeper understanding, exceptions, and nuanced applications of the concepts.
+- **Distractor Subtlety:** The incorrect multiple-choice options (distractors) should be plausible but clearly wrong for lower difficulties. For difficulty ${difficulty}, make the distractors more subtle and plausible, requiring a precise understanding to identify the correct answer. Common misconceptions make good distractors at higher levels.
+
+For each question, provide 4 options, and the correct answer must be one of the options.`;
         
         const response = await ai.models.generateContent({
             model,
@@ -91,4 +132,32 @@ export const getExamFeedback = async (subject: string, grade: string, results: U
         console.error("Error generating feedback:", error);
         return "There was an error generating feedback for this exam.";
     }
+};
+
+export const generateStudyPlan = async (subject: string, grade: string, goal: string, duration: string): Promise<string> => {
+  try {
+    const prompt = `Create a structured, day-by-day study plan for a student in grade ${grade} studying ${subject}.
+    Their specific goal is: "${goal}".
+    The desired duration for this plan is: "${duration}".
+
+    Please provide a detailed plan with the following structure:
+    - A brief overview of the plan.
+    - A daily breakdown. For each day, include:
+        - The main topic(s) to focus on.
+        - 2-3 specific, actionable learning tasks (e.g., "Read Chapter 3 of the textbook on X", "Watch a short video explaining Y", "Complete 5 practice problems on Z").
+        - A small review or self-assessment task (e.g., "Try to explain the main concept to a friend", "Write a 3-sentence summary of what you learned").
+
+    Keep the tone encouraging and motivating. The plan should be realistic for a student to follow.
+    Format the entire response in markdown, using headings, bold text, and lists to make it easy to read and follow.`;
+
+    const response = await ai.models.generateContent({
+        model,
+        contents: prompt
+    });
+    
+    return response.text;
+  } catch (error) {
+    console.error("Error generating study plan:", error);
+    return "I'm sorry, I encountered an error while trying to create your study plan. Please try again.";
+  }
 };

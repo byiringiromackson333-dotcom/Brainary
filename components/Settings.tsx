@@ -1,3 +1,4 @@
+
 import React, { useState, useCallback } from 'react';
 import { User } from '../types';
 import Button from './common/Button';
@@ -14,6 +15,8 @@ interface SettingsProps {
 const Settings: React.FC<SettingsProps> = ({ user, onSave, onClearReports, onBack }) => {
   const [name, setName] = useState(user.name);
   const [grade, setGrade] = useState(user.grade);
+  const [school, setSchool] = useState(user.school || '');
+  const [learningGoals, setLearningGoals] = useState(user.learningGoals || '');
   const [avatar, setAvatar] = useState(user.avatar);
   const [avatarPreview, setAvatarPreview] = useState(user.avatar);
   const [error, setError] = useState('');
@@ -38,7 +41,7 @@ const Settings: React.FC<SettingsProps> = ({ user, onSave, onClearReports, onBac
       return;
     }
     setError('');
-    onSave({ name, grade, avatar });
+    onSave({ ...user, name, grade, avatar, school, learningGoals });
   };
 
   return (
@@ -82,6 +85,28 @@ const Settings: React.FC<SettingsProps> = ({ user, onSave, onClearReports, onBac
               onChange={(e) => setGrade(e.target.value)}
               className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-primary focus:border-primary sm:text-sm"
               placeholder="e.g., 5th Grade"
+            />
+          </div>
+          <div>
+            <label htmlFor="school" className="block text-sm font-medium text-text-secondary">School</label>
+            <input
+              type="text"
+              id="school"
+              value={school}
+              onChange={(e) => setSchool(e.target.value)}
+              className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-primary focus:border-primary sm:text-sm"
+              placeholder="e.g., Springfield Elementary"
+            />
+          </div>
+          <div>
+            <label htmlFor="learningGoals" className="block text-sm font-medium text-text-secondary">Learning Goals</label>
+            <textarea
+              id="learningGoals"
+              rows={3}
+              value={learningGoals}
+              onChange={(e) => setLearningGoals(e.target.value)}
+              className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-primary focus:border-primary sm:text-sm"
+              placeholder="e.g., Master algebra, prepare for science fair"
             />
           </div>
           {error && <p className="text-red-500 text-sm">{error}</p>}
