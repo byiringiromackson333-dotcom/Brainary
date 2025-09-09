@@ -1,6 +1,6 @@
 
 import { GoogleGenAI, Type } from "@google/genai";
-import { Question, UserAnswer } from "../types";
+import { Question, UserAnswer, GeneratedStudyDay } from "../types";
 
 const API_KEY = process.env.API_KEY;
 
@@ -134,30 +134,54 @@ export const getExamFeedback = async (subject: string, grade: string, results: U
     }
 };
 
-export const generateStudyPlan = async (subject: string, grade: string, goal: string, duration: string): Promise<string> => {
+export const generateStudyPlan = async (subject: string, grade: string, goal: string, duration: string): Promise<GeneratedStudyDay[]> => {
   try {
     const prompt = `Create a structured, day-by-day study plan for a student in grade ${grade} studying ${subject}.
     Their specific goal is: "${goal}".
     The desired duration for this plan is: "${duration}".
 
-    Please provide a detailed plan with the following structure:
-    - A brief overview of the plan.
-    - A daily breakdown. For each day, include:
-        - The main topic(s) to focus on.
-        - 2-3 specific, actionable learning tasks (e.g., "Read Chapter 3 of the textbook on X", "Watch a short video explaining Y", "Complete 5 practice problems on Z").
-        - A small review or self-assessment task (e.g., "Try to explain the main concept to a friend", "Write a 3-sentence summary of what you learned").
+    For each day, provide:
+    - A title for the day (e.g., "Day 1", "Monday").
+    - The main topic(s) to focus on.
+    - 2-4 specific, actionable learning tasks.
 
-    Keep the tone encouraging and motivating. The plan should be realistic for a student to follow.
-    Format the entire response in markdown, using headings, bold text, and lists to make it easy to read and follow.`;
+    The plan should be realistic and motivating.`;
 
     const response = await ai.models.generateContent({
         model,
-        contents: prompt
+        contents: prompt,
+        config: {
+            responseMimeType: "application/json",
+            responseSchema: {
+                type: Type.OBJECT,
+                properties: {
+                    plan: {
+                        type: Type.ARRAY,
+                        items: {
+                            type: Type.OBJECT,
+                            properties: {
+                                day: { type: Type.STRING, description: "The title for the day, e.g., Day 1." },
+                                topic: { type: Type.STRING, description: "Main topic(s) for the day." },
+                                tasks: {
+                                    type: Type.ARRAY,
+                                    items: { type: Type.STRING },
+                                    description: "List of actionable learning tasks for the day."
+                                }
+                            },
+                            required: ["day", "topic", "tasks"]
+                        }
+                    }
+                },
+                required: ["plan"]
+            }
+        }
     });
     
-    return response.text;
+    const jsonStr = response.text.trim();
+    const parsed = JSON.parse(jsonStr);
+    return parsed.plan || [];
   } catch (error) {
     console.error("Error generating study plan:", error);
-    return "I'm sorry, I encountered an error while trying to create your study plan. Please try again.";
+    return [];
   }
 };

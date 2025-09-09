@@ -1,5 +1,5 @@
 
-import { User, Report, Flashcard } from '../types';
+import { User, Report, Flashcard, StudyPlan } from '../types';
 
 // New keys for multi-user support
 const USERS_KEY = 'brainary_users';
@@ -9,6 +9,7 @@ const SESSION_KEY = 'brainary_session_user';
 const REPORTS_KEY = 'brainary_reports';
 const FLASHCARDS_KEY = 'brainary_flashcards';
 const NOTEBOOKS_KEY = 'brainary_notebooks';
+const STUDYPLANS_KEY = 'brainary_studyplans';
 
 // --- User and Session Management ---
 
@@ -133,6 +134,49 @@ export const deleteFlashcard = (subject: string, flashcardId: string, username: 
   userFlashcards[subject] = subjectFlashcards;
   allUsersFlashcards[username] = userFlashcards;
   localStorage.setItem(FLASHCARDS_KEY, JSON.stringify(allUsersFlashcards));
+};
+
+export const updateFlashcard = (subject: string, updatedCard: Flashcard, username: string): void => {
+  const allUsersFlashcards = getAllFlashcardsData();
+  const userFlashcards = allUsersFlashcards[username] || {};
+  let subjectFlashcards = userFlashcards[subject] || [];
+  const cardIndex = subjectFlashcards.findIndex(card => card.id === updatedCard.id);
+  if (cardIndex !== -1) {
+    subjectFlashcards[cardIndex] = updatedCard;
+    userFlashcards[subject] = subjectFlashcards;
+    allUsersFlashcards[username] = userFlashcards;
+    localStorage.setItem(FLASHCARDS_KEY, JSON.stringify(allUsersFlashcards));
+  }
+};
+
+// Study Plans
+const getAllStudyPlansData = (): Record<string, Record<string, StudyPlan>> => {
+    const plansJson = localStorage.getItem(STUDYPLANS_KEY);
+    return plansJson ? JSON.parse(plansJson) : {};
+};
+
+export const getStudyPlan = (subject: string, username: string): StudyPlan | null => {
+    const allUsersPlans = getAllStudyPlansData();
+    const userPlans = allUsersPlans[username] || {};
+    return userPlans[subject] || null;
+};
+
+export const saveStudyPlan = (subject: string, plan: StudyPlan, username: string): void => {
+    const allUsersPlans = getAllStudyPlansData();
+    const userPlans = allUsersPlans[username] || {};
+    userPlans[subject] = plan;
+    allUsersPlans[username] = userPlans;
+    localStorage.setItem(STUDYPLANS_KEY, JSON.stringify(allUsersPlans));
+};
+
+export const deleteStudyPlan = (subject: string, username: string): void => {
+    const allUsersPlans = getAllStudyPlansData();
+    const userPlans = allUsersPlans[username] || {};
+    if (userPlans[subject]) {
+        delete userPlans[subject];
+        allUsersPlans[username] = userPlans;
+        localStorage.setItem(STUDYPLANS_KEY, JSON.stringify(allUsersPlans));
+    }
 };
 
 
