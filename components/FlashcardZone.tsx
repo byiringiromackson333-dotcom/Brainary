@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useMemo } from 'react';
 import { Subject, Flashcard as FlashcardType, User } from '../types';
 import { getFlashcards, saveFlashcard, deleteFlashcard, updateFlashcard } from '../services/localStorageService';
@@ -143,18 +144,20 @@ const FlashcardZone: React.FC<FlashcardZoneProps> = ({ user, subject, onBack }) 
         });
     };
 
+    const inputStyles = "mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm dark:bg-slate-700 dark:border-slate-600 dark:text-white";
+
     const renderManager = () => (
         <>
             <Card className="mb-8">
                 <h3 className="text-xl font-bold mb-4">{editingCardId ? 'Edit Flashcard' : 'Create New Flashcard'}</h3>
                 <form onSubmit={handleSubmitCard} className="space-y-4">
                     <div>
-                        <label htmlFor="front" className="block text-sm font-medium text-text-secondary">Front (Term/Question)</label>
-                        <input id="front" value={frontText} onChange={e => setFrontText(e.target.value)} className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm" />
+                        <label htmlFor="front" className="block text-sm font-medium text-text-secondary dark:text-slate-300">Front (Term/Question)</label>
+                        <input id="front" value={frontText} onChange={e => setFrontText(e.target.value)} className={inputStyles} />
                     </div>
                      <div>
-                        <label htmlFor="back" className="block text-sm font-medium text-text-secondary">Back (Definition/Answer)</label>
-                        <input id="back" value={backText} onChange={e => setBackText(e.target.value)} className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm" />
+                        <label htmlFor="back" className="block text-sm font-medium text-text-secondary dark:text-slate-300">Back (Definition/Answer)</label>
+                        <input id="back" value={backText} onChange={e => setBackText(e.target.value)} className={inputStyles} />
                     </div>
                     {error && <p className="text-red-500 text-sm">{error}</p>}
                     <div className="flex justify-end items-center space-x-2">
@@ -170,17 +173,17 @@ const FlashcardZone: React.FC<FlashcardZoneProps> = ({ user, subject, onBack }) 
                 <h3 className="text-xl font-bold mb-4">Your Flashcards ({flashcards.length})</h3>
                 {flashcards.length > 0 ? (
                     <>
-                        <div className="flex items-center justify-between p-2 mb-2 bg-gray-50 rounded-md">
+                        <div className="flex items-center justify-between p-2 mb-2 bg-gray-50 dark:bg-slate-700/50 rounded-md">
                             <div className="flex items-center">
                                 <input
                                     type="checkbox"
                                     id="select-all"
-                                    className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary"
+                                    className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary dark:bg-slate-600 dark:border-slate-500"
                                     checked={selectedCards.size === flashcards.length && flashcards.length > 0}
                                     onChange={handleSelectAll}
                                     aria-label="Select all flashcards"
                                 />
-                                <label htmlFor="select-all" className="ml-2 text-sm font-medium text-text-secondary">
+                                <label htmlFor="select-all" className="ml-2 text-sm font-medium text-text-secondary dark:text-slate-300">
                                     Select All ({selectedCards.size} / {flashcards.length})
                                 </label>
                             </div>
@@ -191,7 +194,7 @@ const FlashcardZone: React.FC<FlashcardZoneProps> = ({ user, subject, onBack }) 
                                     <input
                                         type="checkbox"
                                         id={`select-${card.id}`}
-                                        className="h-5 w-5 rounded border-gray-300 text-primary focus:ring-primary flex-shrink-0"
+                                        className="h-5 w-5 rounded border-gray-300 text-primary focus:ring-primary dark:bg-slate-600 dark:border-slate-500 flex-shrink-0"
                                         checked={selectedCards.has(card.id)}
                                         onChange={(e) => handleSelectCard(card.id, e.target.checked)}
                                         aria-labelledby={`card-front-${card.id}`}
@@ -209,7 +212,7 @@ const FlashcardZone: React.FC<FlashcardZoneProps> = ({ user, subject, onBack }) 
                     </>
                 ) : (
                     <Card className="text-center">
-                        <p className="text-text-secondary">You haven't created any flashcards for this subject yet. Add one above to get started!</p>
+                        <p className="text-text-secondary dark:text-slate-400">You haven't created any flashcards for this subject yet. Add one above to get started!</p>
                     </Card>
                 )}
             </div>
@@ -223,7 +226,7 @@ const FlashcardZone: React.FC<FlashcardZoneProps> = ({ user, subject, onBack }) 
             return (
                 <Card className="text-center">
                     <h3 className="text-2xl font-bold mb-4">Quiz Complete!</h3>
-                    <p className="text-lg text-text-secondary">Here's how you did:</p>
+                    <p className="text-lg text-text-secondary dark:text-slate-400">Here's how you did:</p>
                     <div className="my-6">
                         <p className="text-4xl font-bold text-green-600">{quizResults?.correct} Correct</p>
                         <p className="text-4xl font-bold text-red-600">{quizResults?.incorrect} Incorrect</p>
@@ -239,19 +242,19 @@ const FlashcardZone: React.FC<FlashcardZoneProps> = ({ user, subject, onBack }) 
         const currentCard = shuffledCards[currentCardIndex];
         return (
             <Card>
-                <p className="text-center font-semibold text-text-secondary mb-4">Card {currentCardIndex + 1} of {shuffledCards.length}</p>
-                <div className="bg-gray-50 p-6 rounded-lg min-h-[100px] flex items-center justify-center">
+                <p className="text-center font-semibold text-text-secondary dark:text-slate-400 mb-4">Card {currentCardIndex + 1} of {shuffledCards.length}</p>
+                <div className="bg-gray-50 dark:bg-slate-700 p-6 rounded-lg min-h-[100px] flex items-center justify-center">
                     <p className="text-2xl font-semibold text-center">{currentCard.front}</p>
                 </div>
 
                 <div className="mt-6">
-                    <label htmlFor="userAnswer" className="block text-sm font-medium text-text-secondary mb-2">Your Answer</label>
+                    <label htmlFor="userAnswer" className="block text-sm font-medium text-text-secondary dark:text-slate-300 mb-2">Your Answer</label>
                     <textarea 
                         id="userAnswer" 
                         rows={4}
                         value={userAnswer} 
                         onChange={e => setUserAnswer(e.target.value)} 
-                        className="w-full p-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary disabled:bg-gray-100"
+                        className="w-full p-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary disabled:bg-gray-100 dark:bg-slate-900 dark:border-slate-600 dark:text-white dark:disabled:bg-slate-700"
                         placeholder="Type your answer here..."
                         disabled={isAnswerShown}
                         aria-label="Your answer input"
@@ -266,11 +269,11 @@ const FlashcardZone: React.FC<FlashcardZoneProps> = ({ user, subject, onBack }) 
                     <div className="mt-6 animate-fade-in space-y-4">
                         <div>
                             <h4 className="font-bold text-text-primary">Your Answer:</h4>
-                            <p className="p-4 bg-blue-50 border border-blue-200 rounded-lg whitespace-pre-wrap min-h-[4rem]">{userAnswer}</p>
+                            <p className="p-4 bg-blue-50 border border-blue-200 rounded-lg whitespace-pre-wrap min-h-[4rem] dark:bg-blue-900/50 dark:border-blue-800">{userAnswer}</p>
                         </div>
                         <div>
                             <h4 className="font-bold text-text-primary">Correct Answer:</h4>
-                            <p className="p-4 bg-green-50 border border-green-200 rounded-lg whitespace-pre-wrap min-h-[4rem]">{currentCard.back}</p>
+                            <p className="p-4 bg-green-50 border border-green-200 rounded-lg whitespace-pre-wrap min-h-[4rem] dark:bg-green-900/50 dark:border-green-800">{currentCard.back}</p>
                         </div>
                         <div className="text-center pt-4">
                             <p className="font-semibold mb-3">How did you do?</p>

@@ -134,7 +134,7 @@ const ExamZone: React.FC<ExamZoneProps> = ({ user, subject, exam, onFinishExam, 
     return (
         <div className="flex flex-col items-center justify-center h-64">
             <Spinner size="lg" />
-            <p className="mt-4 text-xl font-semibold text-text-secondary">Grading your exam and generating feedback...</p>
+            <p className="mt-4 text-xl font-semibold text-text-secondary dark:text-slate-400">Grading your exam and generating feedback...</p>
         </div>
     );
   }
@@ -143,20 +143,20 @@ const ExamZone: React.FC<ExamZoneProps> = ({ user, subject, exam, onFinishExam, 
     <div className="animate-slide-in-up max-w-4xl mx-auto">
       <div className="flex items-center mb-6">
         <Button onClick={onBack} variant="secondary" size="sm" className="mr-4">&larr; Dashboard</Button>
-        <h2 className="text-3xl font-bold">{subject.name} Exam <span className="text-xl text-text-secondary font-medium">(Lvl {exam.difficulty})</span></h2>
+        <h2 className="text-3xl font-bold">{subject.name} Exam <span className="text-xl text-text-secondary dark:text-slate-400 font-medium">(Lvl {exam.difficulty})</span></h2>
       </div>
       <Card>
         <div className="mb-4">
           <div className="flex justify-between items-center mb-2">
             <p className="font-semibold">Question {currentQuestionIndex + 1} of {exam.questions.length}</p>
             <div className="flex items-center space-x-2">
-                <svg xmlns="http://www.w3.org/2000/svg" className={`h-6 w-6 transition-colors ${timeLeft < 60 ? 'text-red-500' : 'text-text-secondary'}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <svg xmlns="http://www.w3.org/2000/svg" className={`h-6 w-6 transition-colors ${timeLeft < 60 ? 'text-red-500' : 'text-text-secondary dark:text-slate-400'}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
-                <p className={`font-bold text-lg transition-colors ${timeLeft < 60 ? 'text-red-500' : 'text-text-primary'}`}>{formatTime(timeLeft)}</p>
+                <p className={`font-bold text-lg transition-colors ${timeLeft < 60 ? 'text-red-500' : 'text-text-primary dark:text-slate-100'}`}>{formatTime(timeLeft)}</p>
             </div>
           </div>
-          <div className="w-full bg-gray-200 rounded-full h-2.5">
+          <div className="w-full bg-gray-200 rounded-full h-2.5 dark:bg-slate-700">
             <div className="bg-primary h-2.5 rounded-full" style={{ width: `${progressPercentage}%` }}></div>
           </div>
         </div>
@@ -170,10 +170,10 @@ const ExamZone: React.FC<ExamZoneProps> = ({ user, subject, exam, onFinishExam, 
             <button
               key={index}
               onClick={() => handleAnswerSelect(option)}
-              className={`w-full text-left p-4 border rounded-lg transition-colors ${
+              className={`w-full text-left p-4 border rounded-lg transition-colors dark:border-slate-600 ${
                 answers[currentQuestionIndex] === option
                   ? 'bg-primary text-white border-primary'
-                  : 'bg-white hover:bg-gray-100'
+                  : 'bg-white hover:bg-gray-100 dark:bg-slate-700 dark:hover:bg-slate-600'
               }`}
             >
               {option}

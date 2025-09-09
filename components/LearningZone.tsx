@@ -1,3 +1,4 @@
+
 import React, { useState, useCallback, useEffect, useRef } from 'react';
 import { User, Subject, ChatMessage } from '../types';
 import Button from './common/Button';
@@ -73,18 +74,18 @@ const LearningZone: React.FC<LearningZoneProps> = ({ user, subject, onBack }) =>
             <Button onClick={onBack} variant="secondary" size="sm" className="mr-4">&larr; Back</Button>
             <h2 className="text-3xl font-bold">Learning {subject.name}</h2>
         </div>
-      <div className="bg-white rounded-xl shadow-lg h-[70vh] flex flex-col">
+      <div className="bg-white rounded-xl shadow-lg h-[70vh] flex flex-col dark:bg-slate-800 dark:border dark:border-slate-700">
         <div className="flex-1 p-6 overflow-y-auto space-y-4">
           {messages.map((msg, index) => (
             <div key={index} className={`flex ${msg.sender === 'user' ? 'justify-end' : 'justify-start'}`}>
-              <div className={`prose max-w-lg p-3 rounded-2xl ${msg.sender === 'user' ? 'bg-primary text-white' : 'bg-gray-200 text-text-primary'}`}>
+              <div className={`prose dark:prose-invert max-w-lg p-3 rounded-2xl ${msg.sender === 'user' ? 'bg-primary text-white' : 'bg-gray-200 text-text-primary dark:bg-slate-700'}`}>
                 <ReactMarkdown>{msg.text}</ReactMarkdown>
               </div>
             </div>
           ))}
           {isLoading && (
             <div className="flex justify-start">
-                <div className="max-w-lg p-3 rounded-2xl bg-gray-200 text-text-primary flex items-center">
+                <div className="max-w-lg p-3 rounded-2xl bg-gray-200 text-text-primary dark:bg-slate-700 flex items-center">
                     <Spinner size="sm" />
                     <span className="ml-2">Thinking...</span>
                 </div>
@@ -92,20 +93,20 @@ const LearningZone: React.FC<LearningZoneProps> = ({ user, subject, onBack }) =>
           )}
            <div ref={chatEndRef} />
         </div>
-        <div className="p-4 border-t">
+        <div className="p-4 border-t dark:border-slate-700">
           {(isGeneratingSuggestions || suggestedTopics.length > 0) && (
             <div className="mb-4 px-2">
-                <div className="flex items-center text-sm font-semibold text-text-secondary mb-2">
+                <div className="flex items-center text-sm font-semibold text-text-secondary dark:text-slate-400 mb-2">
                     <SparklesIcon className="w-5 h-5 mr-2 text-primary" />
                     <span>Related Topics</span>
                 </div>
-                {isGeneratingSuggestions && <div className="text-sm text-text-secondary">Generating suggestions...</div>}
+                {isGeneratingSuggestions && <div className="text-sm text-text-secondary dark:text-slate-400">Generating suggestions...</div>}
                 <div className="flex flex-wrap gap-2">
                     {suggestedTopics.map((topic, i) => (
                         <button 
                             key={i} 
                             onClick={() => handleSuggestionClick(topic)}
-                            className="bg-primary/10 text-primary hover:bg-primary/20 text-sm font-medium py-1 px-3 rounded-full transition-colors"
+                            className="bg-primary/10 text-primary hover:bg-primary/20 dark:bg-primary/20 dark:hover:bg-primary/30 text-sm font-medium py-1 px-3 rounded-full transition-colors"
                         >
                             {topic}
                         </button>
@@ -119,7 +120,7 @@ const LearningZone: React.FC<LearningZoneProps> = ({ user, subject, onBack }) =>
               value={input}
               onChange={(e) => setInput(e.target.value)}
               placeholder={`Ask about ${subject.name}...`}
-              className="flex-1 px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-primary"
+              className="flex-1 px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-primary dark:bg-slate-700 dark:border-slate-600 dark:text-white dark:placeholder:text-slate-400"
               disabled={isLoading}
             />
             <Button type="submit" disabled={isLoading || !input.trim()} className="rounded-full">Send</Button>

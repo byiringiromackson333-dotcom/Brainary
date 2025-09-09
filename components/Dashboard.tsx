@@ -72,11 +72,11 @@ const Dashboard: React.FC<DashboardProps> = ({ user, onStartLearning, onStartExa
                 };
                 onStartExamRequest(subjectForExam, newExam);
             } else {
-                alert("Sorry, we couldn't generate an exam right now. Please try again later.");
+                addNotification("Sorry, we couldn't generate an exam right now. Please try again later.", 'error');
             }
         } catch (error) {
             console.error("Failed to start exam:", error);
-            alert("An error occurred while creating your exam.");
+            addNotification("An error occurred while creating your exam.", 'error');
         } finally {
             setIsLoadingExam(null);
             setSubjectForExam(null);
@@ -113,7 +113,7 @@ const Dashboard: React.FC<DashboardProps> = ({ user, onStartLearning, onStartExa
         <div className="animate-fade-in space-y-12">
             <div>
                 <h2 className="text-2xl sm:text-3xl font-bold mb-2">Welcome back, {user.name}!</h2>
-                <p className="text-base sm:text-lg text-text-secondary">What would you like to work on today?</p>
+                <p className="text-base sm:text-lg text-text-secondary dark:text-slate-400">What would you like to work on today?</p>
             </div>
 
             <section>
@@ -128,7 +128,7 @@ const Dashboard: React.FC<DashboardProps> = ({ user, onStartLearning, onStartExa
                             placeholder="Search subjects..."
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
-                            className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-primary"
+                            className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-primary dark:bg-slate-700 dark:border-slate-600 dark:text-white"
                             aria-label="Search for a subject"
                         />
                     </div>
@@ -160,7 +160,7 @@ const Dashboard: React.FC<DashboardProps> = ({ user, onStartLearning, onStartExa
                     </div>
                 ) : (
                     <Card className="text-center">
-                        <p className="text-text-secondary">No subjects found matching "{searchQuery}".</p>
+                        <p className="text-text-secondary dark:text-slate-400">No subjects found matching "{searchQuery}".</p>
                     </Card>
                 )}
             </section>
@@ -176,8 +176,8 @@ const Dashboard: React.FC<DashboardProps> = ({ user, onStartLearning, onStartExa
                                     <div className="flex items-center space-x-4">
                                         {subject && <div className={`w-10 h-10 rounded-full flex items-center justify-center text-white ${subject.color}`}>{subject.icon}</div>}
                                         <div>
-                                            <p className="font-bold">{report.subject} <span className="text-sm font-normal text-text-secondary">(Lvl {report.difficulty})</span></p>
-                                            <p className="text-sm text-text-secondary">
+                                            <p className="font-bold">{report.subject} <span className="text-sm font-normal text-text-secondary dark:text-slate-400">(Lvl {report.difficulty})</span></p>
+                                            <p className="text-sm text-text-secondary dark:text-slate-400">
                                                 {new Date(report.date).toLocaleDateString()}
                                             </p>
                                         </div>
@@ -194,7 +194,7 @@ const Dashboard: React.FC<DashboardProps> = ({ user, onStartLearning, onStartExa
                     </div>
                 ) : (
                     <Card className="text-center">
-                        <p className="text-text-secondary">You haven't completed any exams yet. Take one to see your report here!</p>
+                        <p className="text-text-secondary dark:text-slate-400">You haven't completed any exams yet. Take one to see your report here!</p>
                     </Card>
                 )}
             </section>
@@ -203,10 +203,10 @@ const Dashboard: React.FC<DashboardProps> = ({ user, onStartLearning, onStartExa
                 <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50 animate-fade-in">
                     <Card className="w-full max-w-md animate-slide-in-up">
                         <h3 className="text-xl font-bold mb-2">Exam Settings</h3>
-                        <p className="mb-4 text-text-secondary">Customize your {subjectForExam.name} exam.</p>
+                        <p className="mb-4 text-text-secondary dark:text-slate-400">Customize your {subjectForExam.name} exam.</p>
                         
                         <div>
-                            <label htmlFor="difficulty" className="block text-sm font-medium text-text-secondary">
+                            <label htmlFor="difficulty" className="block text-sm font-medium text-text-secondary dark:text-slate-300">
                                 Difficulty Level: <span className="font-bold text-primary">{examDifficulty}</span>
                             </label>
                             <input
@@ -216,20 +216,20 @@ const Dashboard: React.FC<DashboardProps> = ({ user, onStartLearning, onStartExa
                                 max="43"
                                 value={examDifficulty}
                                 onChange={(e) => setExamDifficulty(Number(e.target.value))}
-                                className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-primary"
+                                className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-primary dark:bg-gray-700"
                                 aria-label={`Select difficulty level. Current level is ${examDifficulty}`}
                             />
-                             <div className="flex justify-between text-xs text-text-secondary mt-1">
+                             <div className="flex justify-between text-xs text-text-secondary dark:text-slate-400 mt-1">
                                 <span>Level 1 (Easy)</span>
                                 <span>Level 43 (Hard)</span>
                             </div>
-                             <p className="text-sm text-text-secondary mt-3 p-3 bg-gray-50 rounded-md">
+                             <p className="text-sm text-text-secondary dark:text-slate-400 mt-3 p-3 bg-gray-50 dark:bg-slate-700 rounded-md">
                                 {getDifficultyDescription(examDifficulty)}
                             </p>
                         </div>
                         
                         <div className="mt-6">
-                            <label className="block text-sm font-medium text-text-secondary mb-3 text-center">
+                            <label className="block text-sm font-medium text-text-secondary dark:text-slate-300 mb-3 text-center">
                                 Number of Questions
                             </label>
                             <div className="flex justify-center space-x-2">
@@ -240,7 +240,7 @@ const Dashboard: React.FC<DashboardProps> = ({ user, onStartLearning, onStartExa
                                         className={`px-4 py-2 text-sm font-semibold rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-all transform active:scale-95 ${
                                             examQuestionCount === num
                                             ? 'bg-primary text-white'
-                                            : 'bg-gray-200 text-text-primary hover:bg-gray-300'
+                                            : 'bg-gray-200 text-text-primary hover:bg-gray-300 dark:bg-slate-600 dark:text-slate-100 dark:hover:bg-slate-500'
                                         }`}
                                     >
                                         {num}

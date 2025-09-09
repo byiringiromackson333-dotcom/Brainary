@@ -61,12 +61,12 @@ const ReportCard: React.FC<ReportCardProps> = ({ user, report, subject, onBack, 
         };
         onStartExam(subject, newExam);
       } else {
-        alert("Sorry, we couldn't generate the next exam. Please try again from the dashboard.");
+        addNotification("Sorry, we couldn't generate the next exam. Please try again from the dashboard.", "error");
         setIsStartingNextLevel(false);
       }
     } catch (error) {
         console.error("Failed to start next level exam:", error);
-        alert("An error occurred while creating your next exam.");
+        addNotification("An error occurred while creating your next exam.", "error");
         setIsStartingNextLevel(false);
     }
   };
@@ -84,13 +84,13 @@ const ReportCard: React.FC<ReportCardProps> = ({ user, report, subject, onBack, 
                     <h3 className="text-lg font-bold mb-4 text-center">Your Score</h3>
                     <div className="flex flex-col items-center">
                         <p className={`text-6xl font-bold ${getScoreColor()}`}>{report.score}/{report.totalQuestions}</p>
-                        <p className="text-2xl font-semibold text-text-secondary mt-2">{scorePercentage.toFixed(0)}%</p>
+                        <p className="text-2xl font-semibold text-text-secondary dark:text-slate-400 mt-2">{scorePercentage.toFixed(0)}%</p>
                     </div>
                 </Card>
                  {passed && (
-                    <Card className="bg-green-50 border-green-200 border">
-                        <h3 className="text-lg font-bold mb-3 text-center text-green-800">Excellent Work!</h3>
-                        <p className="text-center text-green-700 mb-4">You've mastered this level. Ready for a new challenge?</p>
+                    <Card className="bg-green-50 border-green-200 border dark:bg-green-900/50 dark:border-green-800">
+                        <h3 className="text-lg font-bold mb-3 text-center text-green-800 dark:text-green-300">Excellent Work!</h3>
+                        <p className="text-center text-green-700 dark:text-green-400 mb-4">You've mastered this level. Ready for a new challenge?</p>
                         <Button
                             onClick={handleNextLevel}
                             disabled={isStartingNextLevel}
@@ -111,7 +111,7 @@ const ReportCard: React.FC<ReportCardProps> = ({ user, report, subject, onBack, 
             <div className="lg:col-span-2">
                 <Card>
                     <h3 className="text-xl font-bold mb-4">AI Feedback & Suggestions</h3>
-                    <div className="prose max-w-none">
+                    <div className="prose max-w-none dark:prose-invert">
                       <ReactMarkdown>{report.feedback}</ReactMarkdown>
                     </div>
                 </Card>
@@ -119,13 +119,13 @@ const ReportCard: React.FC<ReportCardProps> = ({ user, report, subject, onBack, 
                     <h3 className="text-xl font-bold mb-4">Question Breakdown</h3>
                     <ul className="space-y-4">
                         {report.results.map((result, index) => (
-                            <li key={index} className="p-4 bg-gray-50 rounded-lg">
+                            <li key={index} className="p-4 bg-gray-50 rounded-lg dark:bg-slate-700/50">
                                 <p className="font-semibold">{index + 1}. {result.question}</p>
-                                <p className={`mt-2 ${result.isCorrect ? 'text-green-600' : 'text-red-600'}`}>
+                                <p className={`mt-2 ${result.isCorrect ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
                                     Your answer: {result.chosenAnswer} {result.isCorrect ? ' (Correct)' : ' (Incorrect)'}
                                 </p>
                                 {!result.isCorrect && (
-                                    <p className="text-blue-600">Correct answer: {result.correctAnswer}</p>
+                                    <p className="text-blue-600 dark:text-blue-400">Correct answer: {result.correctAnswer}</p>
                                 )}
                             </li>
                         ))}

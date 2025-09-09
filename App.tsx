@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
-import { User, View, Subject, Exam, Report, Notification } from './types';
-import { getLoggedInUser, logout, updateUser, clearReports as clearUserReports } from './services/localStorageService';
+import { User, View, Subject, Exam, Report, Notification, Theme } from './types';
+import { getLoggedInUser, logout, updateUser, clearReports as clearUserReports, getTheme, saveTheme } from './services/localStorageService';
 import Header from './components/Header';
 import Home from './components/Home';
 import Login from './components/Login';
@@ -17,7 +17,7 @@ import { APP_NAME } from './constants';
 import { CheckCircleIcon, ExclamationTriangleIcon, XCircleIcon } from './components/common/Icons';
 
 const SplashScreen: React.FC = () => (
-  <div className="fixed inset-0 bg-background flex justify-center items-center z-50 animate-lighting-flash">
+  <div className="fixed inset-0 bg-background flex justify-center items-center z-50 animate-lighting-flash dark:bg-slate-900">
     <h1 className="text-5xl md:text-7xl font-bold text-primary animate-rain-drop">
       {APP_NAME}
     </h1>
@@ -32,12 +32,12 @@ const NotificationComponent: React.FC<{ notification: Notification; onDismiss: (
     };
 
     return (
-        <div className="bg-white rounded-lg shadow-lg p-4 flex items-start space-x-4 animate-slide-in-up">
+        <div className="bg-white rounded-lg shadow-lg p-4 flex items-start space-x-4 animate-slide-in-up dark:bg-slate-800 dark:border dark:border-slate-700">
             <div>{iconMap[notification.type]}</div>
             <div className="flex-1">
-                <p className="font-semibold text-text-primary">{notification.message}</p>
+                <p className="font-semibold text-text-primary dark:text-slate-100">{notification.message}</p>
             </div>
-            <button onClick={() => onDismiss(notification.id)} className="text-gray-400 hover:text-gray-600">
+            <button onClick={() => onDismiss(notification.id)} className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
                 <XCircleIcon className="w-5 h-5" />
             </button>
         </div>
@@ -53,6 +53,20 @@ const App: React.FC = () => {
   const [currentExam, setCurrentExam] = useState<Exam | null>(null);
   const [currentReport, setCurrentReport] = useState<Report | null>(null);
   const [notifications, setNotifications] = useState<Notification[]>([]);
+  const [theme, setTheme] = useState<Theme>(getTheme());
+
+  useEffect(() => {
+    if (theme === 'dark') {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+    saveTheme(theme);
+  }, [theme]);
+
+  const handleThemeToggle = () => {
+    setTheme(prevTheme => prevTheme === 'light' ? 'dark' : 'light');
+  };
 
   useEffect(() => {
     const splashTimer = setTimeout(() => {
@@ -106,13 +120,13 @@ const App: React.FC = () => {
   
   const handleSettingsSave = (updatedUser: User) => {
       handleUserUpdate(updatedUser);
-      alert('Profile updated successfully!');
+      addNotification('Profile updated successfully!');
   };
   
   const handleClearReports = () => {
     if (user && window.confirm('Are you sure you want to delete all exam reports? This action cannot be undone.')) {
         clearUserReports(user.username);
-        alert('All exam reports have been deleted.');
+        addNotification('All exam reports have been deleted.', 'warning');
     }
   };
 
@@ -200,7 +214,7 @@ const App: React.FC = () => {
   const isAuthView = !showSplash && (currentView === View.HOME || currentView === View.LOGIN || currentView === View.REGISTER);
 
   return (
-    <div className="min-h-screen bg-background font-sans text-text-primary">
+    <div className="min-h-screen bg-background dark:bg-slate-900 font-sans text-text-primary dark:text-slate-100">
       {showSplash && <SplashScreen />}
       
       <div className="fixed top-4 right-4 z-50 space-y-2">
@@ -209,7 +223,7 @@ const App: React.FC = () => {
         ))}
       </div>
 
-      {!showSplash && !isAuthView && <Header user={user} onLogout={handleLogout} onShowSettings={showSettings} />}
+      {!showSplash && !isAuthView && <Header user={user} onLogout={handleLogout} onShowSettings={showSettings} theme={theme} onThemeToggle={handleThemeToggle} />}
       <main className={!isAuthView && !showSplash ? "container mx-auto p-4 md:p-8" : ""}>
         {renderContent()}
       </main>

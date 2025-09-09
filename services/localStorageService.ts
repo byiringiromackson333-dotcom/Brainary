@@ -1,15 +1,35 @@
 
-import { User, Report, Flashcard, StudyPlan } from '../types';
+import { User, Report, Flashcard, StudyPlan, Theme } from '../types';
 
 // New keys for multi-user support
 const USERS_KEY = 'brainary_users';
 const SESSION_KEY = 'brainary_session_user';
+const THEME_KEY = 'brainary_theme';
 
 // Keys for user-specific data
 const REPORTS_KEY = 'brainary_reports';
 const FLASHCARDS_KEY = 'brainary_flashcards';
 const NOTEBOOKS_KEY = 'brainary_notebooks';
 const STUDYPLANS_KEY = 'brainary_studyplans';
+
+// --- Theme Management ---
+
+export const getTheme = (): Theme => {
+    const theme = localStorage.getItem(THEME_KEY);
+    if (theme === 'light' || theme === 'dark') {
+        return theme;
+    }
+    // Default to system preference if no theme is set
+    if (window.matchMedia?.('(prefers-color-scheme: dark)').matches) {
+        return 'dark';
+    }
+    return 'light';
+};
+
+export const saveTheme = (theme: Theme): void => {
+    localStorage.setItem(THEME_KEY, theme);
+};
+
 
 // --- User and Session Management ---
 

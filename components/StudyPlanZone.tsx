@@ -117,28 +117,30 @@ const StudyPlanZone: React.FC<StudyPlanZoneProps> = ({ user, subject, onBack }) 
         return (completedTasks / allTasks.length) * 100;
     }, [studyPlan]);
 
+    const inputStyles = "mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary dark:bg-slate-700 dark:border-slate-600 dark:text-white dark:placeholder-gray-400";
+
     const renderForm = () => (
         <Card className="max-w-2xl mx-auto">
             <h3 className="text-xl font-bold mb-4">Create a Study Plan</h3>
-            <p className="text-text-secondary mb-6">Tell me what you want to learn, and I'll generate a personalized, trackable plan to help you achieve it.</p>
+            <p className="text-text-secondary dark:text-slate-400 mb-6">Tell me what you want to learn, and I'll generate a personalized, trackable plan to help you achieve it.</p>
             <form onSubmit={handleGeneratePlan} className="space-y-4">
                 <div>
-                    <label htmlFor="goal" className="block text-sm font-medium text-text-secondary">What is your learning goal?</label>
+                    <label htmlFor="goal" className="block text-sm font-medium text-text-secondary dark:text-slate-300">What is your learning goal?</label>
                     <input 
                         id="goal" 
                         value={goal} 
                         onChange={e => setGoal(e.target.value)} 
-                        className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
+                        className={inputStyles}
                         placeholder={`e.g., Understand the basics of ${subject.name}`}
                     />
                 </div>
                 <div>
-                    <label htmlFor="duration" className="block text-sm font-medium text-text-secondary">How long do you have?</label>
+                    <label htmlFor="duration" className="block text-sm font-medium text-text-secondary dark:text-slate-300">How long do you have?</label>
                     <input 
                         id="duration" 
                         value={duration} 
                         onChange={e => setDuration(e.target.value)} 
-                        className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
+                        className={inputStyles}
                         placeholder="e.g., 1 week, 3 days, a weekend"
                     />
                 </div>
@@ -155,10 +157,10 @@ const StudyPlanZone: React.FC<StudyPlanZoneProps> = ({ user, subject, onBack }) 
     const renderPlan = () => (
         studyPlan && (
             <Card>
-                <div className="flex flex-col sm:flex-row justify-between sm:items-center mb-6 gap-4 border-b pb-4">
+                <div className="flex flex-col sm:flex-row justify-between sm:items-center mb-6 gap-4 border-b dark:border-slate-700 pb-4">
                     <div>
                         <h3 className="text-2xl font-bold">Your Study Plan</h3>
-                        <p className="text-text-secondary mt-1"><strong>Goal:</strong> {studyPlan.goal} (<strong>Duration:</strong> {studyPlan.duration})</p>
+                        <p className="text-text-secondary dark:text-slate-400 mt-1"><strong>Goal:</strong> {studyPlan.goal} (<strong>Duration:</strong> {studyPlan.duration})</p>
                     </div>
                     <div className="flex items-center gap-2 flex-shrink-0">
                         <Button onClick={handleDownload} variant="secondary" size="sm" className="flex items-center gap-2">
@@ -174,7 +176,7 @@ const StudyPlanZone: React.FC<StudyPlanZoneProps> = ({ user, subject, onBack }) 
                         <span className="text-base font-medium text-primary">Progress</span>
                         <span className="text-sm font-medium text-primary">{Math.round(progress)}%</span>
                     </div>
-                    <div className="w-full bg-gray-200 rounded-full h-2.5">
+                    <div className="w-full bg-gray-200 rounded-full h-2.5 dark:bg-slate-700">
                         <div className="bg-primary h-2.5 rounded-full transition-all duration-500" style={{ width: `${progress}%` }}></div>
                     </div>
                 </div>
@@ -182,7 +184,7 @@ const StudyPlanZone: React.FC<StudyPlanZoneProps> = ({ user, subject, onBack }) 
                 <div className="space-y-6">
                     {studyPlan.plan.map((day, dayIndex) => (
                         <div key={dayIndex}>
-                            <h4 className="font-bold text-lg mb-3 text-text-primary border-l-4 border-primary pl-3">{day.day}: <span className="font-normal">{day.topic}</span></h4>
+                            <h4 className="font-bold text-lg mb-3 text-text-primary dark:text-slate-100 border-l-4 border-primary pl-3">{day.day}: <span className="font-normal">{day.topic}</span></h4>
                             <ul className="space-y-3 pl-4">
                                 {day.tasks.map((task, taskIndex) => (
                                     <li key={taskIndex} className="flex items-start">
@@ -191,12 +193,12 @@ const StudyPlanZone: React.FC<StudyPlanZoneProps> = ({ user, subject, onBack }) 
                                             id={`task-${dayIndex}-${taskIndex}`}
                                             checked={task.completed}
                                             onChange={() => handleToggleTask(dayIndex, taskIndex)}
-                                            className="h-5 w-5 rounded border-gray-300 text-primary focus:ring-primary mt-1 cursor-pointer flex-shrink-0"
+                                            className="h-5 w-5 rounded border-gray-300 text-primary focus:ring-primary mt-1 cursor-pointer flex-shrink-0 dark:bg-slate-600 dark:border-slate-500"
                                             aria-label={task.description}
                                         />
                                         <label
                                             htmlFor={`task-${dayIndex}-${taskIndex}`}
-                                            className={`ml-3 text-text-primary cursor-pointer transition-colors ${task.completed ? 'line-through text-text-secondary' : ''}`}
+                                            className={`ml-3 text-text-primary dark:text-slate-200 cursor-pointer transition-colors ${task.completed ? 'line-through text-text-secondary dark:text-slate-500' : ''}`}
                                         >
                                             {task.description}
                                         </label>
@@ -222,8 +224,8 @@ const StudyPlanZone: React.FC<StudyPlanZoneProps> = ({ user, subject, onBack }) 
         return (
             <div className="flex flex-col items-center justify-center text-center p-8">
                 <Spinner size="lg" />
-                <p className="mt-4 text-lg font-semibold text-text-secondary">Crafting your personalized study plan...</p>
-                <p className="text-sm text-text-secondary">This might take a moment.</p>
+                <p className="mt-4 text-lg font-semibold text-text-secondary dark:text-slate-400">Crafting your personalized study plan...</p>
+                <p className="text-sm text-text-secondary dark:text-slate-400">This might take a moment.</p>
             </div>
         );
     }
